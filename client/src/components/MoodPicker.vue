@@ -6,6 +6,7 @@
     :tertiary="!isActive(mood)"
     :type="mood === 'SAD' ? 'info' : mood === 'ANGRY' ? 'error' : 'primary'"
     @click="changeMood(mood)"
+    :style="{ width: '100%' }"
     block
   >
     I'm {{ mood.toLowerCase() }}

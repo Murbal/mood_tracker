@@ -1,27 +1,38 @@
 <template>
-  <Container>
+  <div class="container">
     <MoodEntry
       user="Emirhan"
-      description="Description"
+      initial-description="Description"
       initial-mood="ANGRY"
       :date="new Date()"
     ></MoodEntry>
-  </Container>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Container from "./components/Container.vue";
 import MoodEntry from "./components/MoodEntry.vue";
 
 export default defineComponent({
   name: "App",
   components: {
     MoodEntry,
-    Container,
   },
   data() {
     return {};
   },
 });
 </script>
+
+<style scoped>
+.container {
+  width: 80%;
+  margin: auto;
+}
+
+@media screen and (min-width: 1600px) {
+  .container {
+    width: 50%;
+  }
+}
+</style>
