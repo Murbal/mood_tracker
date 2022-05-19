@@ -12,3 +12,6 @@ const NUMBER_REGEX = /^\d+(\.\d+)?$/;
 export const isNumberParsable = createTypeGuard<string>(
   (v) => isString(v) && v.match(NUMBER_REGEX) !== null
 );
+export const isPlainObject = createTypeGuard<Record<string, unknown>>(
+  (v) => !isNil(v) && Object.getPrototypeOf(v)?.constructor === Object
+);
