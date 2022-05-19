@@ -39,6 +39,10 @@ class MoodStorage {
 
     return updatedEntry;
   }
+
+  public getEntries(): MoodEntry[] {
+    return Array.from(this.moodEntries.values());
+  }
 }
 
 export const moodStorage = new MoodStorage();

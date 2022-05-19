@@ -6,7 +6,7 @@ import {
 } from '../moodEntry';
 import { moodStorage } from '../storage';
 
-export const updateEntryRoute = (
+const updateEntryRoute = (
   req: Request<MoodEntryUpdateInput>,
   res: Response
 ) => {
@@ -19,3 +19,5 @@ export const updateEntryRoute = (
 
   res.json(updatedEntry);
 };
+
+export default updateEntryRoute;
