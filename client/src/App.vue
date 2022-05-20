@@ -4,6 +4,7 @@
       user="Emirhan"
       initial-description="Description"
       :date="new Date()"
+      initial-edit
     ></MoodEntry>
   </div>
 </template>
