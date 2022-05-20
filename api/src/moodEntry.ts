@@ -6,7 +6,7 @@ export enum Mood {
   ANGRY = 'ANGRY',
   SAD = 'SAD',
 }
-/** has to be in following date format: DD/MM/YYYY */
+/** has to be in following date format: YYYY-MM-DD */
 export type MoodEntryDate = string;
 export interface MoodEntry {
   date: MoodEntryDate;
@@ -15,8 +15,8 @@ export interface MoodEntry {
 }
 export type MoodEntryUpdateInput = Partial<MoodEntry>;
 
-/** regex for format DD.MM.YYYY */
-const MOOD_ENTRY_DATE_REGEX = /^\d\d.\d\d.\d\d\d\d$/;
+/** regex for format YYYY-MM-DD */
+const MOOD_ENTRY_DATE_REGEX = /^\d\d\d\d-\d\d-\d\d$/;
 /** checks if provided value is a valid MoodEntryDate */
 export const isMoodEntryDate = createTypeGuard<MoodEntryDate>(
   (maybeMoodEntryDate) => {
