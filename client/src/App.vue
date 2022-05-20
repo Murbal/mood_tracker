@@ -9,6 +9,7 @@
       :initial-description="moodEntry.description"
       :initial-mood="moodEntry.mood"
       :initial-edit="false"
+      @submit="(entry) => updateEntry(moodEntry.date, entry)"
     />
   </div>
 </template>
@@ -31,6 +32,31 @@ export default defineComponent({
       const res = await axios.get("/entries");
 
       this.entries = this.entries.concat(res.data ?? []);
+    },
+    async refetchEntry(date: string) {
+      const res = await axios.get(`/entries/${date}`);
+
+      const entryToUpdateIdx = this.entries.findIndex(
+        (entry) => entry.date === date
+      );
+      if (entryToUpdateIdx === -1) {
+        return;
+      }
+
+      const entryToUpdate = this.entries[entryToUpdateIdx];
+      entryToUpdate.description = res.data.description;
+      entryToUpdate.mood = res.data.mood;
+
+      this.entries = [
+        ...this.entries.slice(0, entryToUpdateIdx),
+        entryToUpdate,
+        ...this.entries.slice(entryToUpdateIdx + 1),
+      ];
+    },
+    async updateEntry(date: string, input: Omit<TMoodEntry, "date">) {
+      await axios.patch(`/entries/${date}`, input);
+
+      await this.refetchEntry(date);
     },
   },
   data() {

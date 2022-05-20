@@ -19,16 +19,21 @@
         <h3>Description *</h3>
         <EditableText
           multiline
-          v-model="description"
+          :model-value="editableTextValue"
           :edit="edit"
           :rows="6"
           :status="descriptionError ? 'error' : undefined"
           :helper-text="descriptionError"
+          @update:model-value="edit ? (description = $event) : undefined"
         />
       </div>
       <div>
         <h3>MOOD *</h3>
-        <MoodPicker :edit="edit" v-model="mood" />
+        <MoodPicker
+          :edit="edit"
+          :model-value="moodPickerValue"
+          @update:model-value="edit ? (mood = $event) : undefined"
+        />
       </div>
       <n-space v-if="edit" justify="end" class="submit-container">
         <n-button circle size="large" @click="submit">
@@ -48,7 +53,6 @@ import ReadableDate from "./ReadableDate.vue";
 import EditableText from "./EditableText.vue";
 import { NButton, NCard, NIcon, NSpace } from "naive-ui";
 import { Send as SendSvg, Edit as EditSvg, X as XSvg } from "@vicons/tabler";
-import { resetData } from "@/lib/resetData";
 
 export interface TMoodEntry {
   date: string;
@@ -72,14 +76,23 @@ export default defineComponent({
     EditableText,
   },
   data: (vm) => {
-    const data = {
-      mood: vm.$props.initialMood,
-      description: vm.$props.initialDescription,
+    return {
+      mood: undefined as Mood | undefined,
+      description: undefined as string | undefined,
       hasSubmitted: false,
       edit: vm.$props.initialEdit,
     };
-
-    return { ...data, initialData: data };
+  },
+  watch: {
+    edit(newEditValue) {
+      if (newEditValue) {
+        this.description = this.initialDescription;
+        this.mood = this.initialMood;
+      } else {
+        this.description = undefined;
+        this.mood = undefined;
+      }
+    },
   },
   methods: {
     submit() {
@@ -89,18 +102,24 @@ export default defineComponent({
       }
 
       this.$emit("submit", { mood: this.mood, description: this.description });
+      this.toggleEditMode();
     },
     toggleEditMode() {
-      // reset data when user wants to exit edit mode
-      if (this.edit) {
-        resetData(this.$data);
-      } else {
-        this.edit = !this.edit;
-      }
+      this.edit = !this.edit;
     },
   },
   computed: {
+    moodPickerValue(): Mood {
+      return this.mood ?? this.initialMood;
+    },
+    editableTextValue(): string {
+      return this.description ?? this.initialDescription;
+    },
     descriptionError(): string {
+      if (this.description === undefined) {
+        return "";
+      }
+
       if (this.hasSubmitted && !this.description) {
         return "Required";
       }
