@@ -1,5 +1,11 @@
 import { MoodEntry, MoodEntryDate, MoodEntryUpdateInput } from './moodEntry';
+import { pipe } from './utils/pipe';
 import { isNil } from './utils/typeGuards';
+
+type Order = 'ASC' | 'DESC';
+interface GetEntriesOpts {
+  dateSort?: Order;
+}
 
 class MoodStorage {
   protected static instance: MoodStorage;
@@ -40,8 +46,28 @@ class MoodStorage {
     return updatedEntry;
   }
 
-  public getEntries(): MoodEntry[] {
-    return Array.from(this.moodEntries.values());
+  public getEntries(opts?: GetEntriesOpts): MoodEntry[] {
+    const entries = Array.from(this.moodEntries.values());
+
+    const pipes: CallableFunction[] = [];
+    const createSortPipe =
+      (order: Order) =>
+      (entries: MoodEntry[]): MoodEntry[] => {
+        return entries.sort((a, b) => {
+          const first = order === 'DESC' ? b : a;
+          const second = order === 'DESC' ? a : b;
+
+          return (
+            new Date(first.date).getTime() - new Date(second.date).getTime()
+          );
+        });
+      };
+
+    if (opts?.dateSort) {
+      pipes.push(createSortPipe(opts.dateSort));
+    }
+
+    return pipe(pipes, entries);
   }
 }
 
