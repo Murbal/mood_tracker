@@ -1,7 +1,7 @@
 import { Nil } from './types';
 import { createTypeGuard } from './validator';
 
-export const isNil = createTypeGuard<Nil>((v) => v === null || v === undefined);
+export const isNil = createTypeGuard<Nil>((v) => v == null);
 export const isString = createTypeGuard<string>(
   (v) => !isNil(v) && typeof v === 'string'
 );

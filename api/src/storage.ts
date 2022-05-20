@@ -8,6 +8,17 @@ interface GetEntriesOpts {
   dateSort?: Order;
 }
 
+const createMoodEntrySortPipe =
+  (order: Order) =>
+  (entries: MoodEntry[]): MoodEntry[] => {
+    return entries.sort((a, b) => {
+      const first = order === 'DESC' ? b : a;
+      const second = order === 'DESC' ? a : b;
+
+      return new Date(first.date).getTime() - new Date(second.date).getTime();
+    });
+  };
+
 class MoodStorage {
   protected static instance: MoodStorage;
   protected moodEntries = new Map<MoodEntryDate, MoodEntry>();
@@ -51,21 +62,9 @@ class MoodStorage {
     const entries = Array.from(this.moodEntries.values());
 
     const pipes: CallableFunction[] = [];
-    const createSortPipe =
-      (order: Order) =>
-      (entries: MoodEntry[]): MoodEntry[] => {
-        return entries.sort((a, b) => {
-          const first = order === 'DESC' ? b : a;
-          const second = order === 'DESC' ? a : b;
-
-          return (
-            new Date(first.date).getTime() - new Date(second.date).getTime()
-          );
-        });
-      };
 
     if (opts?.dateSort) {
-      pipes.push(createSortPipe(opts.dateSort));
+      pipes.push(createMoodEntrySortPipe(opts.dateSort));
     }
 
     return pipe(pipes, entries);

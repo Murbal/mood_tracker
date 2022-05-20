@@ -20,3 +20,5 @@ export const createTypeGuard =
   (maybeOfType: unknown): maybeOfType is T => {
     return validator(maybeOfType);
   };
+
+  
