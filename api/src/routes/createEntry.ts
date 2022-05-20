@@ -4,7 +4,6 @@ import { moodStorage } from '../storage';
 
 const createEntryRoute = (req: Request, res: Response) => {
   assertMoodEntry(req.body);
-  console.log(req.body.date);
   assertMoodEntryDate(req.body.date);
 
   const addedEntry = moodStorage.addEntry(req.body);

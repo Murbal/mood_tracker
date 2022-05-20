@@ -11,8 +11,6 @@ export const createAssert =
   <T>(errorMessage: string, typeGuard: TypeGuard<T>) =>
   (value: unknown): asserts value is T => {
     if (!typeGuard(value)) {
-      console.error(`AssertionError: ${errorMessage}. Provided: ${value}`);
-
       throw new Error(`AssertionError: ${errorMessage}`);
     }
   };
