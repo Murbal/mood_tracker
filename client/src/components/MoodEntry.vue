@@ -50,8 +50,15 @@ import { NButton, NCard, NIcon, NSpace } from "naive-ui";
 import { Send as SendSvg, Edit as EditSvg, X as XSvg } from "@vicons/tabler";
 import { resetData } from "@/lib/resetData";
 
+export interface TMoodEntry {
+  date: string;
+  description: string;
+  mood: Mood;
+}
+
 export default defineComponent({
-  name: "MoodEntryBase",
+  name: "MoodEntry",
+  emits: ["submit"],
   components: {
     NCard,
     NButton,
@@ -76,9 +83,12 @@ export default defineComponent({
   },
   methods: {
     submit() {
-      console.log(this.mood);
-      console.log(this.description);
-      return;
+      this.hasSubmitted = true;
+      if (this.descriptionError) {
+        return;
+      }
+
+      this.$emit("submit", { mood: this.mood, description: this.description });
     },
     toggleEditMode() {
       // reset data when user wants to exit edit mode

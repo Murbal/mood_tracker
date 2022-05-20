@@ -2,24 +2,42 @@
   <div class="container">
     <MoodEntry
       user="Emirhan"
-      initial-description="Description"
-      :date="new Date()"
-      initial-edit
-    ></MoodEntry>
+      v-for="moodEntry of entries"
+      :key="moodEntry.date"
+      :date="new Date(moodEntry.date)"
+      :initial-description="moodEntry.description"
+      :initial-mood="moodEntry.mood"
+      :initial-edit="false"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import MoodEntry from "./components/MoodEntry.vue";
+import MoodEntry, { TMoodEntry } from "./components/MoodEntry.vue";
+import { axios } from "./lib/axios";
 
 export default defineComponent({
   name: "App",
   components: {
     MoodEntry,
   },
+  async created() {
+    await this.fetchEntries();
+  },
+  methods: {
+    async fetchEntries() {
+      const res = await axios.get("/entries");
+
+      this.entries = this.entries.concat(res.data ?? []);
+    },
+  },
   data() {
-    return {};
+    const entries: TMoodEntry[] = [];
+
+    return {
+      entries,
+    };
   },
 });
 </script>

@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import env from './env';
 import createEntryRoute from './routes/createEntry';
@@ -9,6 +10,7 @@ import updateEntryRoute from './routes/updateEntry';
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cors());
 
 app.post('/entries', createEntryRoute);
 app.patch('/entries/:date', updateEntryRoute);
