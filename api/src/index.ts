@@ -13,11 +13,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get('/entries', entriesRoute);
-app.post('/entries', createEntryRoute);
+app.get('/entries/summary', summaryRoute);
 app.patch('/entries/:date', updateEntryRoute);
 app.get('/entries/:date', entryRoute);
-app.get('/entries/summary', summaryRoute);
+app.get('/entries', entriesRoute);
+app.post('/entries', createEntryRoute);
 
 app.listen(env.PORT, () => {
   console.log(`listening on port ${env.PORT}`);

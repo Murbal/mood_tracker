@@ -11,18 +11,37 @@
       :initial-edit="false"
       @submit="(entry) => updateEntry(moodEntry.date, entry)"
     />
+    <MoodSummaryModal :open="showSummary" @update:open="showSummary = false" />
+    <n-button
+      circle
+      size="large"
+      type="primary"
+      :style="{ position: 'fixed', bottom: '2em', right: '2em' }"
+      @click="showSummary = true"
+    >
+      <n-icon size="large">
+        <chart-bar-svg />
+      </n-icon>
+    </n-button>
   </div>
 </template>
 
 <script lang="ts">
+import { ChartBar as ChartBarSvg } from "@vicons/tabler";
+import { NButton, NIcon } from "naive-ui";
 import { defineComponent } from "vue";
 import MoodEntry, { TMoodEntry } from "./components/MoodEntry.vue";
+import MoodSummaryModal from "./components/MoodSummaryModal.vue";
 import { axios } from "./lib/axios";
 
 export default defineComponent({
   name: "App",
   components: {
     MoodEntry,
+    MoodSummaryModal,
+    NButton,
+    NIcon,
+    ChartBarSvg,
   },
   async created() {
     await this.fetchEntries();
@@ -59,13 +78,10 @@ export default defineComponent({
       await this.refetchEntry(date);
     },
   },
-  data() {
-    const entries: TMoodEntry[] = [];
-
-    return {
-      entries,
-    };
-  },
+  data: () => ({
+    entries: [] as TMoodEntry[],
+    showSummary: true,
+  }),
 });
 </script>
 
