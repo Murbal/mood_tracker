@@ -1,6 +1,7 @@
 import { MoodEntry, MoodEntryDate, MoodEntryUpdateInput } from './moodEntry';
 import { pipe } from './utils/pipe';
 import { isNil } from './utils/typeGuards';
+import { Maybe } from './utils/types';
 
 type Order = 'ASC' | 'DESC';
 interface GetEntriesOpts {
@@ -68,6 +69,10 @@ class MoodStorage {
     }
 
     return pipe(pipes, entries);
+  }
+
+  public getEntry(date: MoodEntryDate): Maybe<MoodEntry> {
+    return this.moodEntries.get(date);
   }
 }
 
