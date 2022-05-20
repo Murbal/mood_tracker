@@ -1,12 +1,12 @@
 <template>
   <n-button
+    class="btn--full-width"
     v-for="mood of moods"
     :key="mood"
-    :disabled="edit && (isActive(mood) ? false : true)"
+    :disabled="isDisabled(mood)"
     :tertiary="!isActive(mood)"
-    :type="mood === 'SAD' ? 'info' : mood === 'ANGRY' ? 'error' : 'primary'"
-    @click="changeMood(mood)"
-    :style="{ width: '100%' }"
+    :type="getType(mood)"
+    @click="$emit('update:modelValue', mood)"
     block
   >
     I'm {{ mood.toLowerCase() }}
@@ -15,11 +15,12 @@
 
 <script lang="ts">
 import { NButton } from "naive-ui";
+import { Type } from "naive-ui/es/button/src/interface";
 import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "MoodPicker",
-  emits: ["changeMood"],
+  emits: ["update:modelValue"],
   components: {
     NButton,
   },
@@ -28,10 +29,13 @@ export default defineComponent({
   }),
   methods: {
     isActive(mood: string): boolean {
-      return mood === this.value;
+      return mood === this.modelValue;
     },
-    changeMood(mood: string) {
-      this.$emit("changeMood", mood);
+    isDisabled(mood: string): boolean {
+      return !this.edit && (this.isActive(mood) ? false : true);
+    },
+    getType(mood: string): Type {
+      return mood === "SAD" ? "info" : mood === "ANGRY" ? "error" : "primary";
     },
   },
   props: {
@@ -39,10 +43,13 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    value: {
-      type: String,
-      required: true,
-    },
+    modelValue: String,
   },
 });
 </script>
+
+<style scoped>
+.btn--full-width {
+  width: 100%;
+}
+</style>

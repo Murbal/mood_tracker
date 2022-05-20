@@ -2,25 +2,25 @@
   <n-card>
     <div>
       <h2>{{ user }}</h2>
-      <ReadableDate class="date" :date="date"></ReadableDate>
+      <ReadableDate class="date" :date="date" />
       <div>
         <h3>Description *</h3>
         <EditableText
-          v-model="description"
-          :error="descriptionError"
-          :rows="6"
-          edit
           multiline
-        ></EditableText>
+          v-model="description"
+          :edit="edit"
+          :rows="6"
+          :status="descriptionError ? 'error' : undefined"
+          :helper-text="descriptionError"
+        />
       </div>
       <div>
         <h3>MOOD *</h3>
-        <MoodPicker
-          :edit="false"
-          :value="mood"
-          @change-mood="changeMood"
-        ></MoodPicker>
+        <MoodPicker :edit="edit" v-model="mood" />
       </div>
+      <n-space v-if="edit" justify="end" class="submit-container">
+        <n-button round type="primary" @click="submit"> S </n-button>
+      </n-space>
     </div>
   </n-card>
 </template>
@@ -30,12 +30,14 @@ import { defineComponent } from "vue";
 import MoodPicker from "./MoodPicker.vue";
 import ReadableDate from "./ReadableDate.vue";
 import EditableText from "./EditableText.vue";
-import { NCard } from "naive-ui";
+import { NButton, NCard, NSpace } from "naive-ui";
 
 export default defineComponent({
   name: "MoodEntryBase",
   components: {
     NCard,
+    NButton,
+    NSpace,
     MoodPicker,
     ReadableDate,
     EditableText,
@@ -45,6 +47,13 @@ export default defineComponent({
     description: vm.$props.initialDescription,
     hasSubmitted: false,
   }),
+  methods: {
+    submit() {
+      console.log(this.mood);
+      console.log(this.description);
+      return;
+    },
+  },
   computed: {
     descriptionError(): string {
       if (this.hasSubmitted && !this.description) {
@@ -52,11 +61,6 @@ export default defineComponent({
       }
 
       return this.description.length > 100 ? "Maximum 100 characters" : "";
-    },
-  },
-  methods: {
-    changeMood(mood: string): void {
-      this.mood = mood;
     },
   },
   props: {
@@ -74,7 +78,11 @@ export default defineComponent({
     },
     initialMood: {
       type: String,
-      required: true,
+      default: "HAPPY",
+    },
+    edit: {
+      type: Boolean,
+      default: false,
     },
   },
 });
@@ -83,5 +91,8 @@ export default defineComponent({
 <style scoped>
 .date {
   color: grey;
+}
+.submit-container {
+  padding-top: 2em;
 }
 </style>

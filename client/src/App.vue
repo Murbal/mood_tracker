@@ -3,7 +3,6 @@
     <MoodEntry
       user="Emirhan"
       initial-description="Description"
-      initial-mood="ANGRY"
       :date="new Date()"
     ></MoodEntry>
   </div>

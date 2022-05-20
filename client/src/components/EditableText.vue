@@ -1,51 +1,33 @@
 <template>
   <p v-if="!edit">{{ modelValue }}</p>
-  <n-input
+  <AppInput
     v-else
-    variant="outlined"
-    placeholder="Describe"
-    :value="modelValue"
-    :status="error ? 'error' : undefined"
-    @input="$emit('update:modelValue', $event)"
-    :type="multiline ? 'textarea' : 'text'"
+    :placeholder="placeholder"
+    :model-value="modelValue"
     :rows="rows"
-  ></n-input>
-  <n-text v-if="error" type="error">
-    {{ error }}
-  </n-text>
+    :status="status"
+    :helper-text="helperText"
+    :multiline="multiline"
+    @update:modelValue="$emit('update:modelValue', $event)"
+  />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { NInput, NText } from "naive-ui";
+import AppInput, { InputProps } from "./Input.vue";
 
 export default defineComponent({
   name: "EditableText",
   emits: ["update:modelValue"],
   components: {
-    NInput,
-    NText,
+    AppInput,
   },
   props: {
-    modelValue: {
-      type: String,
-      required: true,
-    },
     edit: {
       type: Boolean,
       default: false,
     },
-    error: {
-      type: String,
-      default: "",
-    },
-    multiline: {
-      type: Boolean,
-      default: false,
-    },
-    rows: {
-      type: Number,
-    },
+    ...InputProps,
   },
 });
 </script>
