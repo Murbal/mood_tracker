@@ -2,6 +2,7 @@
   <div class="container">
     <MoodEntry
       user="Emirhan"
+      class="mood-entry"
       v-for="moodEntry of entries"
       :key="moodEntry.date"
       :date="new Date(moodEntry.date)"
@@ -46,6 +47,10 @@ export default defineComponent({
 .container {
   width: 80%;
   margin: auto;
+}
+
+.mood-entry {
+  margin: 2em 0;
 }
 
 @media screen and (min-width: 1600px) {
