@@ -42,8 +42,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import MoodPicker from "./MoodPicker.vue";
+import { defineComponent, PropType } from "vue";
+import MoodPicker, { Mood } from "./MoodPicker.vue";
 import ReadableDate from "./ReadableDate.vue";
 import EditableText from "./EditableText.vue";
 import { NButton, NCard, NIcon, NSpace } from "naive-ui";
@@ -112,7 +112,7 @@ export default defineComponent({
       required: true,
     },
     initialMood: {
-      type: String,
+      type: String as PropType<Mood>,
       default: "HAPPY",
     },
     initialEdit: {
