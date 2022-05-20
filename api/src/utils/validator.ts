@@ -14,6 +14,7 @@ export const createAssert =
       throw new Error(`AssertionError: ${errorMessage}`);
     }
   };
+/** creates a custom type guard that checks if provided value returns true for validator */
 export const createTypeGuard =
   <T>(validator: Validator) =>
   (maybeOfType: unknown): maybeOfType is T => {

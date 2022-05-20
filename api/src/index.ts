@@ -11,7 +11,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/entries', createEntryRoute);
-app.patch('/entries', updateEntryRoute);
+app.patch('/entries/:date', updateEntryRoute);
 app.get('/entries/summary', summaryRoute);
 app.get('/entries', entriesRoute);
 

@@ -6,16 +6,16 @@ import {
 } from '../moodEntry';
 import { moodStorage } from '../storage';
 
-const updateEntryRoute = (
-  req: Request<MoodEntryUpdateInput>,
-  res: Response
-) => {
-  const { date, ...moodEntryUpdateInput } = req.body;
+type Params = Required<Pick<MoodEntryUpdateInput, 'date'>>;
+type Body = Omit<MoodEntryUpdateInput, 'date'>;
 
-  assertMoodEntryUpdateInput(moodEntryUpdateInput);
+const updateEntryRoute = (req: Request<Params, Body>, res: Response) => {
+  const date = req.params.date;
+
+  assertMoodEntryUpdateInput(req.body);
   assertMoodEntryDate(date);
 
-  const updatedEntry = moodStorage.updateEntry(date, moodEntryUpdateInput);
+  const updatedEntry = moodStorage.updateEntry(date, req.body);
 
   res.json(updatedEntry);
 };

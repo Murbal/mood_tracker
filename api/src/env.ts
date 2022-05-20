@@ -1,12 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { isNumberParsable } from './utils/typeGuards';
+import { isParsableNumber } from './utils/typeGuards';
 import { Assert, createAssert } from './utils/validator';
 
 const assertPort: Assert<string> = createAssert(
   'Env variable "PORT" must be a string parsable to a number',
-  isNumberParsable
+  isParsableNumber
 );
 
 const PORT = process.env.PORT;
