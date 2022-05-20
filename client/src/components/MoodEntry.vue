@@ -48,6 +48,7 @@ import ReadableDate from "./ReadableDate.vue";
 import EditableText from "./EditableText.vue";
 import { NButton, NCard, NIcon, NSpace } from "naive-ui";
 import { Send as SendSvg, Edit as EditSvg, X as XSvg } from "@vicons/tabler";
+import { resetData } from "@/lib/resetData";
 
 export default defineComponent({
   name: "MoodEntryBase",
@@ -82,14 +83,10 @@ export default defineComponent({
     toggleEditMode() {
       // reset data when user wants to exit edit mode
       if (this.edit) {
-        Object.assign(this.$data, {
-          ...this.initialData,
-          edit: !this.edit,
-          initialData: this.initialData,
-        });
-      } else {
-        this.edit = !this.edit;
+        resetData(this.$data);
       }
+
+      this.edit = !this.edit;
     },
   },
   computed: {
