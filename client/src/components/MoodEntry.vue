@@ -94,9 +94,9 @@ export default defineComponent({
       // reset data when user wants to exit edit mode
       if (this.edit) {
         resetData(this.$data);
+      } else {
+        this.edit = !this.edit;
       }
-
-      this.edit = !this.edit;
     },
   },
   computed: {
