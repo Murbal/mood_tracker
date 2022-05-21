@@ -31,6 +31,7 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
   const [isEdit, setIsEdit] = useState(false);
   const [moodEditValue, setMoodEditValue] = useState(mood);
   const [descriptionEditValue, setDescriptionEditValue] = useState(description);
+  const [descriptionError, setDescriptionError] = useState<string | null>();
 
   const theme = useTheme();
   const { loading, error, editMoodEntry } = useMoodEntry(date);
@@ -40,16 +41,24 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
     setMoodEditValue(mood);
   }, [description, mood]);
 
-  const toggleEditMode = useCallback(() => {
-    setIsEdit((isEdit) => {
-      const isExitingEdit = isEdit;
-      if (isExitingEdit) {
-        resetEditState();
-      }
+  const toggleEditMode = useCallback(
+    (skipReset = false) => {
+      setIsEdit((isEdit) => {
+        const isExitingEdit = isEdit;
+        if (isExitingEdit && !skipReset) {
+          resetEditState();
+        }
 
-      return !isEdit;
-    });
-  }, [resetEditState]);
+        return !isEdit;
+      });
+    },
+    [resetEditState]
+  );
+
+  const handleEditButtonClick = useCallback(
+    () => toggleEditMode(),
+    [toggleEditMode]
+  );
 
   const handleMoodChange = useCallback((newMood: Mood) => {
     setMoodEditValue(newMood);
@@ -57,9 +66,17 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
 
   const handleDescriptionChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
+      if (event.target.value.length > 100) {
+        setDescriptionError('Max 100 characters');
+      } else if (event.target.value.length === 0) {
+        setDescriptionError('Required');
+      } else if (descriptionError) {
+        setDescriptionError(null);
+      }
+
       setDescriptionEditValue(event.target.value);
     },
-    []
+    [descriptionError]
   );
 
   const submit = useMemo(
@@ -69,7 +86,7 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
       });
       await onSubmit();
 
-      toggleEditMode();
+      toggleEditMode(true);
     },
     [
       moodEditValue,
@@ -82,7 +99,7 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
 
   const editButtonJsx = useMemo(
     () => (
-      <IconButton onClick={toggleEditMode}>
+      <IconButton onClick={handleEditButtonClick}>
         {isEdit ? <CloseIcon /> : <EditIcon />}
       </IconButton>
     ),
@@ -122,6 +139,8 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
             fullWidth
             value={descriptionEditValue}
             onChange={handleDescriptionChange}
+            error={!!descriptionError}
+            helperText={descriptionError}
             inputProps={{ style: { padding: theme.spacing(1) } }}
           />
         ) : (
@@ -131,7 +150,13 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
         )}
       </Grid>
     ),
-    [descriptionEditValue, isEdit, handleDescriptionChange, theme]
+    [
+      descriptionEditValue,
+      isEdit,
+      handleDescriptionChange,
+      theme,
+      descriptionError,
+    ]
   );
 
   const dateSectionJsx = useMemo(
@@ -148,12 +173,12 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
   const submitSectionJsx = useMemo(
     () => (
       <Grid container item xs={12} justifyContent="end">
-        <IconButton onClick={submit}>
+        <IconButton onClick={submit} disabled={!!descriptionError}>
           <SendIcon />
         </IconButton>
       </Grid>
     ),
-    [submit]
+    [submit, descriptionError]
   );
 
   return (
