@@ -137,11 +137,13 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
         {isEdit ? (
           <TextField
             fullWidth
+            multiline
+            minRows={4}
             value={descriptionEditValue}
             onChange={handleDescriptionChange}
             error={!!descriptionError}
             helperText={descriptionError}
-            inputProps={{ style: { padding: theme.spacing(1) } }}
+            InputProps={{ sx: { padding: theme.spacing(1) } }}
           />
         ) : (
           <Typography variant="body2" display="block">
