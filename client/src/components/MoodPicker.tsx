@@ -55,7 +55,7 @@ export const MoodPicker: FC<Props> = ({ mood, edit = false, onChange }) => {
             fullWidth
             variant={variant}
             disabled={disabled}
-            onClick={createHandleClick(mood)}
+            onClick={createHandleClick(moodToRender)}
             sx={{
               color,
               backgroundColor,
@@ -71,7 +71,7 @@ export const MoodPicker: FC<Props> = ({ mood, edit = false, onChange }) => {
         </Grid>
       );
     },
-    [mood, edit]
+    [mood, edit, createHandleClick]
   );
 
   const moodPickerButtonsJsx = useMemo(
