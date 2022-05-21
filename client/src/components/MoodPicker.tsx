@@ -1,7 +1,15 @@
 import { Button, ButtonProps, Grid } from '@mui/material';
-import { darken, lighten, SystemCssProperties } from '@mui/system';
 import { FC, useCallback, useMemo } from 'react';
 import { Mood, MoodEntry } from '../pages/Index/fetch';
+import { ThemeMood } from '../theme';
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsColorOverrides {
+    happy: true;
+    sad: true;
+    angry: true;
+  }
+}
 
 interface Props extends Pick<MoodEntry, 'mood'> {
   onChange: (mood: Mood) => void;
@@ -27,44 +35,14 @@ export const MoodPicker: FC<Props> = ({ mood, edit = false, onChange }) => {
         ? 'contained'
         : 'outlined';
 
-      const isHappy = moodToRender === Mood.HAPPY;
-      const isSad = moodToRender === Mood.SAD;
-      const isAngry = moodToRender === Mood.ANGRY;
-
-      const moodColor: SystemCssProperties['color'] = isHappy
-        ? '#009600'
-        : isSad
-        ? '#0078cf'
-        : isAngry
-        ? '#a80202'
-        : undefined;
-      const color = isActive ? 'white' : moodColor;
-      const backgroundColor = isActive ? moodColor : undefined;
-      const backgroundColorHover = moodColor
-        ? isActive
-          ? darken(moodColor, 0.1)
-          : lighten(moodColor, 0.9)
-        : undefined;
-      const borderColorHover = backgroundColorHover
-        ? darken(backgroundColorHover, 0.5)
-        : undefined;
-
       return (
         <Grid item xs={12} key={moodToRender}>
           <Button
             fullWidth
             variant={variant}
             disabled={disabled}
+            color={ThemeMood[moodToRender]}
             onClick={createHandleClick(moodToRender)}
-            sx={{
-              color,
-              backgroundColor,
-              borderColor: moodColor,
-              ':hover': {
-                backgroundColor: backgroundColorHover,
-                borderColor: borderColorHover,
-              },
-            }}
           >
             {moodToRender}
           </Button>

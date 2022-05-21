@@ -1,12 +1,21 @@
-import { Grid } from '@mui/material';
-import { FC } from 'react';
+import { Box, Fab, Grid, Modal, useTheme } from '@mui/material';
+import BarCharIcon from '@mui/icons-material/BarChart';
+import { FC, useCallback, useState } from 'react';
 import { Error } from '../../components/Error';
 import { Loading } from '../../components/Loading';
 import { MoodEntryCard } from '../../components/MoodEntry';
+import { MoodSummary } from '../../components/MoodSummary';
 import { useEntries } from './fetch';
 
 const IndexPage: FC = () => {
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+
+  const theme = useTheme();
   const { data: entries, loading, error, refetch } = useEntries();
+
+  const toggleSummary = useCallback(() => {
+    setIsSummaryOpen((v) => !v);
+  }, []);
 
   return (
     <div>
@@ -27,6 +36,32 @@ const IndexPage: FC = () => {
           </Grid>
         ))}
       </Grid>
+      <Fab
+        color="primary"
+        onClick={toggleSummary}
+        sx={{
+          position: 'fixed',
+          bottom: theme.spacing(2),
+          right: theme.spacing(2),
+        }}
+      >
+        <BarCharIcon fontSize="large" />
+      </Fab>
+      <Modal open={isSummaryOpen} onClose={toggleSummary}>
+        <Box
+          sx={{
+            top: '50%',
+            left: '50%',
+            width: '50%',
+            position: 'absolute',
+            transform: 'translate(-50%, -50%)',
+            padding: theme.spacing(4),
+            backgroundColor: theme.palette.background.paper,
+          }}
+        >
+          <MoodSummary />
+        </Box>
+      </Modal>
     </div>
   );
 };
