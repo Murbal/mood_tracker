@@ -4,7 +4,8 @@
   "description": "API for mood-tracker",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Test\""
+    "build": "tsc",
+    "start:prod": "node dist/index.js"
   },
   "author": "Emirhan Güler",
   "license": "ISC",
