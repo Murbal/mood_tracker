@@ -16,6 +16,9 @@ const moodEntryGridBreakpoints: Pick<GridProps, 'xs' | 'md' | 'lg' | 'xl'> = {
   xl: 5,
 };
 
+const USER = 'Emirhan';
+const DEFAULT_MOOD = Mood.HAPPY;
+
 const IndexPage: FC = () => {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isCreateEntry, setIsCreateEntry] = useState(false);
@@ -27,6 +30,14 @@ const IndexPage: FC = () => {
     setIsSummaryOpen((v) => !v);
   }, []);
 
+  const handleRefetch = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  const toggleCreate = useCallback(() => {
+    setIsCreateEntry((v) => !v);
+  }, []);
+
   const entriesJsx = useMemo(() => {
     return entries?.map((entry) => (
       <Grid
@@ -34,45 +45,19 @@ const IndexPage: FC = () => {
         item
         xs={12}
         justifyContent="center"
+        // needed because user can replace entry by creating with already existing date,
+        // gets rendered double if entry.date is being used as key
         key={`${entry.date}-${entry.description}-${entry.mood}`}
       >
         <Grid item {...moodEntryGridBreakpoints}>
-          <MoodEntryCard
-            {...entry}
-            user="Emirhan"
-            onSubmit={async () => {
-              await refetch();
-            }}
-          />
+          <MoodEntryCard {...entry} user={USER} onSubmit={handleRefetch} />
         </Grid>
       </Grid>
     ));
-  }, [entries, refetch]);
+  }, [entries, handleRefetch]);
 
-  return (
-    <div>
-      {loading && <Loading />}
-      <Error message={error?.message} />
-      <Grid container spacing={2}>
-        {isCreateEntry && (
-          <Grid container item xs={12} justifyContent="center">
-            <Grid item {...moodEntryGridBreakpoints}>
-              <MoodEntryCard
-                isCreate
-                user="Emirhan"
-                date={formatDateToIso(new Date())}
-                description=""
-                mood={Mood.HAPPY}
-                onSubmit={async () => {
-                  await refetch({}, { useCache: false });
-                }}
-                onClose={() => setIsCreateEntry(false)}
-              />
-            </Grid>
-          </Grid>
-        )}
-        {entriesJsx}
-      </Grid>
+  const floatingActionButtonsJsx = useMemo(
+    () => (
       <Box
         sx={{
           position: 'fixed',
@@ -87,12 +72,51 @@ const IndexPage: FC = () => {
             </Fab>
           </Grid>
           <Grid item>
-            <Fab color="primary" onClick={() => setIsCreateEntry(true)}>
+            <Fab color="primary" onClick={toggleCreate}>
               <AddIcon fontSize="large" />
             </Fab>
           </Grid>
         </Grid>
       </Box>
+    ),
+    [toggleSummary]
+  );
+
+  const createEntryJsx = useMemo(
+    () =>
+      isCreateEntry && (
+        <Grid container item xs={12} justifyContent="center">
+          <Grid item {...moodEntryGridBreakpoints}>
+            <MoodEntryCard
+              isCreate
+              user={USER}
+              date={formatDateToIso(new Date())}
+              description=""
+              mood={DEFAULT_MOOD}
+              onSubmit={handleRefetch}
+              onClose={toggleCreate}
+            />
+          </Grid>
+        </Grid>
+      ),
+    [isCreateEntry]
+  );
+
+  return (
+    <div>
+      {loading && <Loading />}
+      <Error message={error?.message} />
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          [theme.breakpoints.down('md')]: { marginBottom: theme.spacing(10) }, // make space for floating button
+        }}
+      >
+        {createEntryJsx}
+        {entriesJsx}
+      </Grid>
+      {floatingActionButtonsJsx}
       <Modal open={isSummaryOpen} onClose={toggleSummary}>
         <Box
           sx={{
