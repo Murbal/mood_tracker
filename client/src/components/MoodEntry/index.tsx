@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { ChangeEvent, FC, useCallback, useMemo, useState } from 'react';
 import { Mood, MoodEntry } from '../../pages/Index/fetch';
+import { formatDateToIso } from '../../utils/date';
 import { Error } from '../Error';
 import { Loading } from '../Loading';
 import { MoodPicker } from '../MoodPicker';
@@ -193,7 +194,7 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
     () => (
       <Grid item xs={12}>
         <Typography variant="body1" color="gray">
-          {new Date(date).toLocaleDateString()}
+          {formatDateToIso(new Date(date))}
         </Typography>
       </Grid>
     ),
