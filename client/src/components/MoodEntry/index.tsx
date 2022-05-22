@@ -1,3 +1,6 @@
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import SendIcon from '@mui/icons-material/Send';
 import {
   Card,
   Grid,
@@ -6,19 +9,17 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import CloseIcon from '@mui/icons-material/Close';
-import SendIcon from '@mui/icons-material/Send';
 import { ChangeEvent, FC, useCallback, useMemo, useState } from 'react';
 import { Mood, MoodEntry } from '../../pages/Index/fetch';
-import { MoodPicker } from '../MoodPicker';
-import { useMoodEntry } from './fetch';
-import { Loading } from '../Loading';
 import { Error } from '../Error';
+import { Loading } from '../Loading';
+import { MoodPicker } from '../MoodPicker';
+import { MoodEntryUpdateInput, useMoodEntry } from './fetch';
 
 export interface MoodEntryContainerProps extends MoodEntry {
   user: string;
   onSubmit: () => Promise<void> | void;
+  isCreate?: boolean;
 }
 
 export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
@@ -27,14 +28,15 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
   description,
   mood,
   onSubmit,
+  isCreate = false,
 }) => {
-  const [isEdit, setIsEdit] = useState(false);
+  const [isEdit, setIsEdit] = useState(isCreate);
   const [moodEditValue, setMoodEditValue] = useState(mood);
   const [descriptionEditValue, setDescriptionEditValue] = useState(description);
   const [descriptionError, setDescriptionError] = useState<string | null>();
 
   const theme = useTheme();
-  const { loading, error, editMoodEntry } = useMoodEntry(date);
+  const { loading, error, editMoodEntry, createMoodEntry } = useMoodEntry(date);
 
   const resetEditState = useCallback(() => {
     setDescriptionEditValue(description);
@@ -64,26 +66,49 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
     setMoodEditValue(newMood);
   }, []);
 
+  const getDescriptionErrorMessage = useCallback(
+    (description: string, skipRequiredCheck?: boolean) => {
+      const errorMessage =
+        description.length > 100
+          ? 'Max 100 characters'
+          : description.length === 0 && !skipRequiredCheck
+          ? 'Required'
+          : null;
+
+      return errorMessage;
+    },
+    []
+  );
+
   const handleDescriptionChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      if (event.target.value.length > 100) {
-        setDescriptionError('Max 100 characters');
-      } else if (event.target.value.length === 0) {
-        setDescriptionError('Required');
-      } else if (descriptionError) {
-        setDescriptionError(null);
-      }
+      setDescriptionError(
+        getDescriptionErrorMessage(event.target.value, isCreate)
+      );
 
       setDescriptionEditValue(event.target.value);
     },
-    [descriptionError]
+    [descriptionError, getDescriptionErrorMessage, isCreate]
   );
 
   const submit = useMemo(
     () => async () => {
-      await editMoodEntry({
-        data: { mood: moodEditValue, description: descriptionEditValue },
-      });
+      const descriptionErrorMessage =
+        getDescriptionErrorMessage(descriptionEditValue);
+      if (descriptionErrorMessage) {
+        setDescriptionError(descriptionErrorMessage);
+      }
+
+      const updateInput: MoodEntryUpdateInput = {
+        mood: moodEditValue,
+        description: descriptionEditValue,
+      };
+
+      if (isCreate) {
+        await createMoodEntry({ data: { ...updateInput, date } });
+      } else {
+        await editMoodEntry({ data: updateInput });
+      }
       await onSubmit();
 
       toggleEditMode(true);
@@ -91,9 +116,12 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
     [
       moodEditValue,
       descriptionEditValue,
+      date,
       editMoodEntry,
+      createMoodEntry,
       toggleEditMode,
       onSubmit,
+      getDescriptionErrorMessage,
     ]
   );
 
@@ -110,10 +138,10 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
     () => (
       <Grid container item xs={12} justifyContent="space-between">
         <Typography variant="h4">{user}</Typography>
-        {editButtonJsx}
+        {!isCreate && editButtonJsx}
       </Grid>
     ),
-    [user, editButtonJsx]
+    [user, editButtonJsx, isCreate]
   );
 
   const moodSectionJsx = useMemo(

@@ -1,11 +1,13 @@
 import { Box, Fab, Grid, Modal, useTheme } from '@mui/material';
 import BarCharIcon from '@mui/icons-material/BarChart';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Error } from '../../components/Error';
 import { Loading } from '../../components/Loading';
 import { MoodEntryCard } from '../../components/MoodEntry';
 import { MoodSummary } from '../../components/MoodSummary';
-import { useEntries } from './fetch';
+import { Mood, useEntries } from './fetch';
+import { shiftDateToStartOfDay } from '../../utils/date/range';
+import { formatDateToIso } from '../../utils/date';
 
 const IndexPage: FC = () => {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
@@ -17,24 +19,62 @@ const IndexPage: FC = () => {
     setIsSummaryOpen((v) => !v);
   }, []);
 
+  const isTodayMissing = useMemo(
+    () =>
+      !entries?.some(
+        (entry) =>
+          shiftDateToStartOfDay(new Date(entry.date)).getTime() ===
+          shiftDateToStartOfDay(new Date()).getTime()
+      ),
+    [entries]
+  );
+
+  const entriesJsx = useMemo(() => {
+    const fetchedEntriesJsx = entries?.map((entry) => (
+      <Grid container item xs={12} justifyContent="center" key={entry.date}>
+        <Grid item xs={10} md={7} lg={6} xl={5}>
+          <MoodEntryCard
+            {...entry}
+            user="Emirhan"
+            onSubmit={async () => {
+              await refetch();
+            }}
+          />
+        </Grid>
+      </Grid>
+    ));
+
+    if (!isTodayMissing) {
+      return fetchedEntriesJsx;
+    }
+
+    return (
+      <>
+        <Grid container item xs={12} justifyContent="center">
+          <Grid item xs={10} md={7} lg={6} xl={5}>
+            <MoodEntryCard
+              isCreate
+              user="Emirhan"
+              date={formatDateToIso(new Date())}
+              description=""
+              mood={Mood.HAPPY}
+              onSubmit={async () => {
+                await refetch();
+              }}
+            />
+          </Grid>
+        </Grid>
+        {fetchedEntriesJsx}
+      </>
+    );
+  }, [entries, isTodayMissing, refetch]);
+
   return (
     <div>
       {loading && <Loading />}
       <Error message={error?.message} />
       <Grid container spacing={2}>
-        {entries?.map((v) => (
-          <Grid container item xs={12} justifyContent="center" key={v.date}>
-            <Grid item xs={10} md={7} lg={6} xl={5}>
-              <MoodEntryCard
-                user="Emirhan"
-                {...v}
-                onSubmit={async () => {
-                  await refetch();
-                }}
-              />
-            </Grid>
-          </Grid>
-        ))}
+        {entries != null && entriesJsx}
       </Grid>
       <Fab
         color="primary"
