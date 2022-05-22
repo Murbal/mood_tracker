@@ -1,16 +1,9 @@
-import { createTheme, PaletteColor, PaletteColorOptions } from '@mui/material';
+import { createTheme } from '@mui/material';
 
 export enum ThemeMood {
   HAPPY = 'happy',
   SAD = 'sad',
   ANGRY = 'angry',
-}
-
-declare module '@mui/material/styles' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface Palette extends Record<ThemeMood, PaletteColor> {}
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface PaletteOptions extends Record<ThemeMood, PaletteColorOptions> {}
 }
 
 export const appTheme = createTheme({

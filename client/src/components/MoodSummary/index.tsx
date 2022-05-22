@@ -6,11 +6,6 @@ import { Error } from '../Error';
 import { Loading } from '../Loading';
 import { MoodSummary as TMoodSummary, useMoodSummary } from './fetch';
 
-declare module '@mui/material/LinearProgress' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface LinearProgressPropsColorOverrides extends Record<ThemeMood, true> {}
-}
-
 export const MoodSummary: FC = () => {
   const { data, loading, error } = useMoodSummary();
 

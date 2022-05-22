@@ -3,14 +3,6 @@ import { FC, useCallback, useMemo } from 'react';
 import { Mood, MoodEntry } from '../pages/Index/fetch';
 import { ThemeMood } from '../theme';
 
-declare module '@mui/material/Button' {
-  interface ButtonPropsColorOverrides {
-    happy: true;
-    sad: true;
-    angry: true;
-  }
-}
-
 interface Props extends Pick<MoodEntry, 'mood'> {
   onChange: (mood: Mood) => void;
   edit?: boolean;
