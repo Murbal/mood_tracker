@@ -1,16 +1,24 @@
-import { Box, Fab, Grid, Modal, useTheme } from '@mui/material';
+import { Box, Fab, Grid, GridProps, Modal, useTheme } from '@mui/material';
 import BarCharIcon from '@mui/icons-material/BarChart';
+import AddIcon from '@mui/icons-material/Add';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { Error } from '../../components/Error';
 import { Loading } from '../../components/Loading';
 import { MoodEntryCard } from '../../components/MoodEntry';
 import { MoodSummary } from '../../components/MoodSummary';
 import { Mood, useEntries } from './fetch';
-import { shiftDateToStartOfDay } from '../../utils/date/range';
 import { formatDateToIso } from '../../utils/date';
+
+const moodEntryGridBreakpoints: Pick<GridProps, 'xs' | 'md' | 'lg' | 'xl'> = {
+  xs: 10,
+  md: 7,
+  lg: 6,
+  xl: 5,
+};
 
 const IndexPage: FC = () => {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [isCreateEntry, setIsCreateEntry] = useState(false);
 
   const theme = useTheme();
   const { data: entries, loading, error, refetch } = useEntries();
@@ -19,20 +27,16 @@ const IndexPage: FC = () => {
     setIsSummaryOpen((v) => !v);
   }, []);
 
-  const isTodayMissing = useMemo(
-    () =>
-      !entries?.some(
-        (entry) =>
-          shiftDateToStartOfDay(new Date(entry.date)).getTime() ===
-          shiftDateToStartOfDay(new Date()).getTime()
-      ),
-    [entries]
-  );
-
   const entriesJsx = useMemo(() => {
-    const fetchedEntriesJsx = entries?.map((entry) => (
-      <Grid container item xs={12} justifyContent="center" key={entry.date}>
-        <Grid item xs={10} md={7} lg={6} xl={5}>
+    return entries?.map((entry) => (
+      <Grid
+        container
+        item
+        xs={12}
+        justifyContent="center"
+        key={`${entry.date}-${entry.description}-${entry.mood}`}
+      >
+        <Grid item {...moodEntryGridBreakpoints}>
           <MoodEntryCard
             {...entry}
             user="Emirhan"
@@ -43,50 +47,52 @@ const IndexPage: FC = () => {
         </Grid>
       </Grid>
     ));
-
-    if (!isTodayMissing) {
-      return fetchedEntriesJsx;
-    }
-
-    return (
-      <>
-        <Grid container item xs={12} justifyContent="center">
-          <Grid item xs={10} md={7} lg={6} xl={5}>
-            <MoodEntryCard
-              isCreate
-              user="Emirhan"
-              date={formatDateToIso(new Date())}
-              description=""
-              mood={Mood.HAPPY}
-              onSubmit={async () => {
-                await refetch();
-              }}
-            />
-          </Grid>
-        </Grid>
-        {fetchedEntriesJsx}
-      </>
-    );
-  }, [entries, isTodayMissing, refetch]);
+  }, [entries, refetch]);
 
   return (
     <div>
       {loading && <Loading />}
       <Error message={error?.message} />
       <Grid container spacing={2}>
-        {entries != null && entriesJsx}
+        {isCreateEntry && (
+          <Grid container item xs={12} justifyContent="center">
+            <Grid item {...moodEntryGridBreakpoints}>
+              <MoodEntryCard
+                isCreate
+                user="Emirhan"
+                date={formatDateToIso(new Date())}
+                description=""
+                mood={Mood.HAPPY}
+                onSubmit={async () => {
+                  await refetch({}, { useCache: false });
+                }}
+                onClose={() => setIsCreateEntry(false)}
+              />
+            </Grid>
+          </Grid>
+        )}
+        {entriesJsx}
       </Grid>
-      <Fab
-        color="primary"
-        onClick={toggleSummary}
+      <Box
         sx={{
           position: 'fixed',
           bottom: theme.spacing(2),
           right: theme.spacing(2),
         }}
       >
-        <BarCharIcon fontSize="large" />
-      </Fab>
+        <Grid container spacing={1}>
+          <Grid item>
+            <Fab color="primary" onClick={toggleSummary}>
+              <BarCharIcon fontSize="large" />
+            </Fab>
+          </Grid>
+          <Grid item>
+            <Fab color="primary" onClick={() => setIsCreateEntry(true)}>
+              <AddIcon fontSize="large" />
+            </Fab>
+          </Grid>
+        </Grid>
+      </Box>
       <Modal open={isSummaryOpen} onClose={toggleSummary}>
         <Box
           sx={{

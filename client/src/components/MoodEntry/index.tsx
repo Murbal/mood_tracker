@@ -20,6 +20,7 @@ import { MoodEntryUpdateInput, useMoodEntry } from './fetch';
 export interface MoodEntryContainerProps extends MoodEntry {
   user: string;
   onSubmit: () => Promise<void> | void;
+  onClose?: () => void;
   isCreate?: boolean;
 }
 
@@ -29,6 +30,7 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
   description,
   mood,
   onSubmit,
+  onClose,
   isCreate = false,
 }) => {
   const [isEdit, setIsEdit] = useState(isCreate);
@@ -52,10 +54,11 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
           resetEditState();
         }
 
+        onClose?.();
         return !isEdit;
       });
     },
-    [resetEditState]
+    [resetEditState, onClose]
   );
 
   const handleEditButtonClick = useCallback(
@@ -139,10 +142,10 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
     () => (
       <Grid container item xs={12} justifyContent="space-between">
         <Typography variant="h4">{user}</Typography>
-        {!isCreate && editButtonJsx}
+        {editButtonJsx}
       </Grid>
     ),
-    [user, editButtonJsx, isCreate]
+    [user, editButtonJsx]
   );
 
   const moodSectionJsx = useMemo(
