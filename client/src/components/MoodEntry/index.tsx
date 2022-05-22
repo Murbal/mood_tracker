@@ -36,6 +36,7 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
   const [isEdit, setIsEdit] = useState(isCreate);
   const [moodEditValue, setMoodEditValue] = useState(mood);
   const [descriptionEditValue, setDescriptionEditValue] = useState(description);
+  const [dateEditValue, setDateEditValue] = useState(date);
   const [descriptionError, setDescriptionError] = useState<string | null>();
 
   const theme = useTheme();
@@ -54,9 +55,10 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
           resetEditState();
         }
 
-        onClose?.();
         return !isEdit;
       });
+
+      onClose?.();
     },
     [resetEditState, onClose]
   );
@@ -109,7 +111,9 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
       };
 
       if (isCreate) {
-        await createMoodEntry({ data: { ...updateInput, date } });
+        await createMoodEntry({
+          data: { ...updateInput, date: dateEditValue },
+        });
       } else {
         await editMoodEntry({ data: updateInput });
       }
@@ -120,7 +124,7 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
     [
       moodEditValue,
       descriptionEditValue,
-      date,
+      dateEditValue,
       editMoodEntry,
       createMoodEntry,
       toggleEditMode,
@@ -196,12 +200,20 @@ export const MoodEntryCard: FC<MoodEntryContainerProps> = ({
   const dateSectionJsx = useMemo(
     () => (
       <Grid item xs={12}>
-        <Typography variant="body1" color="gray">
-          {formatDateToIso(new Date(date))}
-        </Typography>
+        {isCreate ? (
+          <TextField
+            value={dateEditValue}
+            type="date"
+            onChange={(e) => setDateEditValue(e.target.value)}
+          />
+        ) : (
+          <Typography variant="body1" color="gray">
+            {formatDateToIso(new Date(dateEditValue))}
+          </Typography>
+        )}
       </Grid>
     ),
-    [date]
+    [dateEditValue, isCreate]
   );
 
   const submitSectionJsx = useMemo(
